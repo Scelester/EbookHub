@@ -1,4 +1,5 @@
 import React from 'react';
+import './SignupPage.css';
 
 const SignupPage: React.FC = () => (
   <div>

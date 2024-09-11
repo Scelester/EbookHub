@@ -1,4 +1,5 @@
 import React from 'react';
+import './LoginPage.css';
 
 const LoginPage: React.FC = () => (
   <div>
