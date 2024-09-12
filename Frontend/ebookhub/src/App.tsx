@@ -6,7 +6,7 @@ import ReaderMode from './components/ReaderMode/ReaderMode';
 import LoginPage from './components/LoginPage/LoginPage';
 import SignupPage from './components/SignupPage/SignupPage';
 import Modal from './components/Modal';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+
 
 const App: React.FC = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -15,22 +15,13 @@ const App: React.FC = () => {
   return (
     <Router>
       <div>
-        {/* Bootstrap Navbar */}
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <div className="container-fluid">
+        {/* Custom Navbar */}
+        <nav className="navbar">
+          <div className="container">
             <Link className="navbar-brand" to="/">Ebookhub</Link>
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse" id="navbarNav">
-              <ul className="navbar-nav ms-auto">
-                <li className="nav-item">
-                  <button className="btn btn-outline-primary mx-2" onClick={() => setIsLoginOpen(true)}>Login</button>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-outline-success mx-2" onClick={() => setIsSignupOpen(true)}>Sign Up</button>
-                </li>
-              </ul>
+            <div className="navbar-buttons">
+              <button className="navbar-button" onClick={() => setIsLoginOpen(true)}>Login</button>
+              <button className="navbar-button" onClick={() => setIsSignupOpen(true)}>Sign Up</button>
             </div>
           </div>
         </nav>

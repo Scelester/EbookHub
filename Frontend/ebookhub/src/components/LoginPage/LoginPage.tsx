@@ -2,12 +2,12 @@ import React from 'react';
 import './LoginPage.css';
 
 const LoginPage: React.FC = () => (
-  <div>
+  <div className="login-page"> 
     <h1>Login</h1>
     <form>
       <label>
-        Email:
-        <input type="email" name="email" />
+        Username or Email:
+        <input type="username_email" name="username_email" />
       </label>
       <label>
         Password:

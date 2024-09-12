@@ -1,39 +1,36 @@
-/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8); /* Darker and more opaque */
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Ensure modal is on top */
+  z-index: 1000;
   overflow: auto;
   transition: opacity 0.3s ease;
 }
 
-/* Modal content */
 .modal-content {
-  background: #ffffff;
-  padding: 40px; /* Increased padding for better spacing */
-  border-radius: 12px; /* More pronounced rounded corners */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
-  width: 90%;
-  max-width: 600px; /* Increased max-width for better readability */
+  background: var(--bg-1); 
+  padding: 30px; /* Adjusted padding for a narrower look */
+  border-radius: 12px;
+  box-shadow: 0 8px 16px var(--shadow-color);
+  width: 80%; /* Adjusted width to make the modal narrower */
+  max-width: 500px; /* Reduced max-width for a narrower modal */
   position: relative;
-  animation: fadeIn 0.3s ease-out; /* Animation for smooth entry */
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Close button */
 .modal-close {
   position: absolute;
   top: 15px;
   right: 15px;
   border: none;
-  background: #f8f8f8;
-  color: #333;
+  background: var(--bg-2);
+  color: var(--color-1);
   font-size: 24px;
   line-height: 1;
   border-radius: 50%;
@@ -47,22 +44,13 @@
 }
 
 .modal-close:hover {
-  background: #e0e0e0;
+  background: var(--bg-3);
 }
 
 .modal-close:focus {
   outline: none;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .modal-content {
-    width: 95%;
-    max-width: none;
-  }
-}
-
-/* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -4,16 +4,16 @@ import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="landing-container d-flex justify-content-center align-items-center">
+    <div className="landing-container">
       <div className="text-center">
-        <h1 className="mb-4">Welcome to Ebookhub</h1>
-        <p className="mb-4">Your one-stop platform for authors and readers alike.</p>
+        <h1>Welcome to Ebookhub</h1>
+        <p>Your one-stop platform for authors and readers alike.</p>
 
-        <div className="d-flex justify-content-center">
-          <Link to="/author" className="btn btn-primary btn-lg mx-2">
+        <div className="button-container">
+          <Link to="/author" className="routingButton">
             Author Mode
           </Link>
-          <Link to="/reader" className="btn btn-secondary btn-lg mx-2">
+          <Link to="/reader" className="routingButton">
             Reader Mode
           </Link>
         </div>

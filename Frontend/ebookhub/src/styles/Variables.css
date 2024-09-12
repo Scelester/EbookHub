@@ -1,0 +1,29 @@
+:root {
+  
+  --bg-1: #ffffff; 
+  --bg-2: #f7f9fc; 
+  --bg-3: #e1e5eb; 
+  --bg-4: #c5cbe0; 
+  --bg-5: #a4a9b0; 
+
+  
+  --color-1: #1e1e1e; 
+  --color-2: #4a4a4a; 
+  --color-3: #6e6e6e; 
+  --color-4: #9e9e9e; 
+  --color-5: #d3d3d3; 
+
+  
+  --accent-1: #6f839a; 
+  --accent-2: #719078; 
+  --accent-3: #917275; 
+  --accent-4: #887e5f; 
+  --accent-5: #67757f; 
+
+  
+  --border-color: #d0d0d0; 
+  --shadow-color: rgba(0, 0, 0, 0.1); 
+  --highlight-color: #f0f4f8; 
+  --link-color: #0056b3; 
+  --link-hover-color: #003d7a; 
+}

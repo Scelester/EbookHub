@@ -1,53 +1,81 @@
-/* Signup Page Styles */
 .signup-page {
   display: flex;
   flex-direction: column;
   align-items: center;
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9; /* Light background for contrast */
-  padding: 20px; /* Add padding for better spacing */
-  border-radius: 12px; /* Match modal rounded corners */
+  background-color: var(--bg-1); 
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
 }
 
 .signup-page h1 {
   margin-bottom: 20px;
-  color: #333; /* Dark color for better readability */
-  font-size: 24px; /* Larger font size for emphasis */
+  color: var(--color-1); 
+  font-size: 24px;
 }
 
 .signup-page form {
   width: 100%;
-  max-width: 400px; /* Limit form width */
   display: flex;
   flex-direction: column;
 }
 
 .signup-page label {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   font-weight: bold;
-  color: #555; /* Slightly lighter color for labels */
+  color: var(--color-2);
 }
 
-.signup-page input {
+.signup-page input,
+.signup-page select {
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ddd; /* Light border */
-  border-radius: 5px; /* Rounded corners */
-  font-size: 16px; /* Larger font size for input text */
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 16px;
 }
 
 .signup-page button {
-  padding: 10px;
+  padding: 12px;
   border: none;
-  border-radius: 5px;
-  background-color: #28a745; /* Primary button color for signup */
-  color: #fff; /* White text */
+  border-radius: 6px;
+  background-color: var(--accent-1); 
+  color: #fff;
   font-size: 16px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .signup-page button:hover {
-  background-color: #218838; /* Darker shade on hover */
+  background-color: var(--accent-2); 
+}
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 220px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; 
+  left: 50%;
+  margin-left: -110px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }
