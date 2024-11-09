@@ -1,46 +1,90 @@
-
+/* App.css */
 .navbar {
-    background-color: var(--bg-3); 
-    padding: 10px 20px; 
-    border-bottom: 1px solid var(--border-color); 
-  }
-  
-  .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .navbar-brand {
-    font-size: 1.5rem;
-    color: var(--color-1); 
-    text-decoration: none;
-  }
-  
-  .navbar-buttons {
-    display: flex;
-    gap: 10px; 
-  }
-  
-  .navbar-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: var(--bg-1); 
-    background-color: var(--accent-1); 
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease; 
-  }
-  
-  .navbar-button:hover {
-    background-color: var(--accent-2); 
-    transform: scale(1.05); 
-  }
-  
-  .navbar-button:active {
-    background-color: var(--accent-3); 
-    transform: scale(0.95); 
-  }
-  
+  background-color: var(--bg-3);
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  color: var(--color-1);
+  text-decoration: none;
+}
+
+.navbar-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.navbar-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--bg-1);
+  background-color: var(--accent-1);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-button:hover {
+  background-color: var(--accent-2);
+  transform: scale(1.05);
+}
+
+.navbar-button:active {
+  background-color: var(--accent-3);
+  transform: scale(0.95);
+}
+
+/* App.css */
+.user-profile-logo {
+  cursor: pointer;
+  position: relative; /* Position for the dropdown */
+  width: 40px; /* Increase logo size */
+  height: 40px; /* Increase logo size */
+  border-radius: 50%; /* Circular border */
+  border: 2px solid var(--accent-1); /* Circular border color */
+  display: flex; /* Center the emoji inside */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  font-size: 1.5rem; /* Increase emoji size */
+}
+
+/* Dropdown styles (logout button)*/
+.dropdown-menu {
+  position: absolute;
+  right: 10px; /* Adds gap from the right edge of the container */
+  top: 55px; /* Position below the logo */
+  background-color: var(--bg-3); /* Match the navbar background */
+  border: 1px solid var(--border-color); /* Use predefined border color */
+  border-radius: 8px; /* Match button corners */
+  z-index: 1000; /* Ensure dropdown is on top */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+  display: flex; /* Allow for button stacking */
+  flex-direction: column; /* Stack buttons vertically */
+  margin-right: 10px; /* Add right margin for gap */
+}
+
+
+.dropdown-menu button {
+  display: block; /* Make buttons stack vertically */
+  width: 100%; /* Full width for buttons */
+  border: none; /* Remove border */
+  background: none; /* Remove background */
+  padding: 10px 40px; /* Padding for buttons */
+  text-align: left; /* Align text to the left */
+  color: var(--color-1); /* Text color */
+  cursor: pointer; /* Change cursor on hover */
+}
+
+.dropdown-menu button:hover {
+  background-color: var(--accent-2); /* Use accent color for hover */
+}

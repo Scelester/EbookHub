@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './LandingPage.css'; 
+import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
   return (
@@ -10,11 +10,12 @@ const LandingPage: React.FC = () => {
         <p>Your one-stop platform for authors and readers alike.</p>
 
         <div className="button-container">
-          <Link to="/author" className="routingButton">
-            Author Mode
-          </Link>
           <Link to="/reader" className="routingButton">
             Reader Mode
+          </Link>
+
+          <Link to="/author" className="routingButton">
+            Author Mode
           </Link>
         </div>
       </div>
