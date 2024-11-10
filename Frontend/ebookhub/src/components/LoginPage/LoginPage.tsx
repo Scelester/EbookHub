@@ -17,8 +17,7 @@ const LoginPage: React.FC = () => {
       // Save JWT tokens in local storage or cookies
       localStorage.setItem('accessToken', data.access);
       localStorage.setItem('refreshToken', data.refresh);
-      console.log(data)
-      
+      localStorage.setItem('user_id',data.user_id);
       
       setSuccess('You are logged in!'); // Set success message
       setError(''); // Clear any previous errors
