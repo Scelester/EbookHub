@@ -5,11 +5,12 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
-from basic.models import Book, Chapter, Fork
+from basic.models import Book, Chapter, Fork, Author,Genre,SupportedFormat
 from basic.serializers import BookSerializer, ChapterSerializer
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
+from django.contrib.auth.models import User
 
 
 class BooksByAuthorView(APIView):
@@ -87,23 +88,43 @@ class UploadEPUBView(APIView):
         # Validate and save the book data
         book_data = request.data
         book_title = book_data.get('title')
-        book_author = book_data.get('author')
-        book_genre = book_data.get('genre')
+        book_author_name = book_data.get('author')
+        book_genre_list = book_data.get('genre')  # Expecting a list of genre names or IDs
         book_description = book_data.get('description')
+        user_id = book_data.get('user_id')  # Get user_id from the request data
 
-        if not all([book_title, book_author, book_genre, book_description]):
-            return Response({"detail": "Missing book details."}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([book_title, book_author_name, book_genre_list, book_description, user_id]):
+            return Response({"detail": "Missing book details or user_id."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Save the book
+        # Retrieve the user instance for publisher
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"detail": "Invalid user_id."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get or create the author instance
+        author, created = Author.objects.get_or_create(name=book_author_name)
+
+        # Assuming 'Format' model exists and you have a default format entry
+        default_format, _ = SupportedFormat.objects.get_or_create(name='EPUB')
+
+        # Process genres
+        genres = []
+        for genre_name in book_genre_list:
+            genre, created = Genre.objects.get_or_create(name=genre_name)
+            genres.append(genre)
+
+        # Create the book instance with the format
         book = Book.objects.create(
             title=book_title,
-            author=book_author,
-            publisher=request.user,
-            genre=book_genre,
+            author=author,
+            publisher=user,
             description=book_description,
             file=epub_file,
-            date_published=datetime.now().strftime("%Y-%m-%d")  # Set current date
+            format=default_format,  # Provide the default format
+            date_published=datetime.now().strftime("%Y-%m-%d")
         )
+       
 
         try:
             book = self.extract_chapters_from_epub(book, epub_file)
@@ -136,6 +157,7 @@ class UploadEPUBView(APIView):
                 chapter_order += 1
 
         return book
+
 
 
 class ChapterListView(APIView):
