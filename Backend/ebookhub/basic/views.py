@@ -2,12 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from rest_framework import status
+from rest_framework import status, generics
 from django.db import IntegrityError
 from django.db.models import Q  
-from .models import Profile  
-from .models import Author, Genre
-from .serializers import AuthorSerializer, UserSerializer, GenreSerializer
+from .models import Author, Genre,Profile,Book
+from .serializers import AuthorSerializer, UserSerializer, GenreSerializer,BookDetailSerializer
+
 
 
 class SignupView(APIView):
@@ -57,6 +57,7 @@ class LoginView(APIView):
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+                'user_id':str(user.id)
             }, status=status.HTTP_200_OK)
         
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -90,3 +91,9 @@ class GenreDetailView(APIView):
             return Response(serializer.data)
         except Genre.DoesNotExist:
             return Response({'error': 'Genre not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class BookDetailView(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookDetailSerializer
+    lookup_field = 'id'

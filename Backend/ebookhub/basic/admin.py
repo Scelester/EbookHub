@@ -13,7 +13,7 @@ class BookAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('title', 'author', 'publisher', 'description', 'genre', 'cover_image', 'can_fork','rating')
+            'fields': ('title', 'author', 'publisher', 'description', 'genre', 'cover_image', 'can_fork','rating','file')
         }),
         ('Publication Details', {
             'fields': ('date_published', 'format'),

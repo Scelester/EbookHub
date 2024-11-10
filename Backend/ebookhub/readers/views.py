@@ -6,6 +6,7 @@ from basic.serializers import BookSerializer
 from readers.models import Love, Bookmark, Rating, Comment, CommentLike
 from readers.serializers import LoveSerializer, BookmarkSerializer, RatingSerializer, CommentSerializer, CommentLikeSerializer
 from rest_framework.pagination import PageNumberPagination
+from django.contrib.auth.models import User
 
 
 # Pagination Class
@@ -33,13 +34,19 @@ class LoveList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, book_id):
-        user = request.data.get('user')
-        book = request.data.get('book')
+        user_id = request.data.get('user_id')  # Get user_id from the request
+        book_id = request.data.get('book_id')  # Get book_id from the request
 
-        if Love.objects.filter(user=user, book=book).exists():
+        user = User.objects.filter(id=user_id).first()  # Retrieve the user object
+        book = Book.objects.filter(id=book_id).first()  # Retrieve the book object
+
+        if not user or not book:
+            return Response({"detail": "User or Book not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if Love.objects.filter(user_id=user, book=book).exists():
             return Response({"detail": "You have already loved this book."}, status=status.HTTP_400_BAD_REQUEST)
 
-        love = Love(user_id=user, book_id=book)
+        love = Love(user_id=user_id, book_id=book_id)
         love.save()
 
         serializer = LoveSerializer(love)
@@ -54,13 +61,19 @@ class BookmarkList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, book_id):
-        user = request.data.get('user')
-        book = request.data.get('book')
+        user_id = request.data.get('user_id')  # Get user_id from the request
+        book_id = request.data.get('book_id')  # Get book_id from the request
 
-        if Bookmark.objects.filter(user=user, book=book).exists():
+        user = User.objects.filter(id=user_id).first()  # Retrieve the user object
+        book = Book.objects.filter(id=book_id).first()  # Retrieve the book object
+
+        if not user or not book:
+            return Response({"detail": "User or Book not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if Bookmark.objects.filter(user_id=user, book=book).exists():
             return Response({"detail": "You have already bookmarked this book."}, status=status.HTTP_400_BAD_REQUEST)
 
-        bookmark = Bookmark(user_id=user, book_id=book)
+        bookmark = Bookmark(user_id=user_id, book_id=book_id)
         bookmark.save()
 
         serializer = BookmarkSerializer(bookmark)
@@ -75,21 +88,27 @@ class RatingList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, book_id):
-        user = request.data.get('user')
-        book = request.data.get('book')
+        user_id = request.data.get('user_id')  # Get user_id from the request
+        book_id = request.data.get('book_id')  # Get book_id from the request
         rating = request.data.get('rating')
 
-        if rating < 0 or rating > 5:
+        user = User.objects.filter(id=user_id).first()  # Retrieve the user object
+        book = Book.objects.filter(id=book_id).first()  # Retrieve the book object
+
+        if not user or not book:
+            return Response({"detail": "User or Book not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if float(rating) < 0 or float(rating) > 5:
             return Response({"detail": "Rating must be between 0 and 5."}, status=status.HTTP_400_BAD_REQUEST)
 
-        existing_rating = Rating.objects.filter(user=user, book=book).first()
+        existing_rating = Rating.objects.filter(user_id=user_id, book_id=book_id).first()
         if existing_rating:
             existing_rating.rating = rating
             existing_rating.save()
             serializer = RatingSerializer(existing_rating)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        rating_obj = Rating(user_id=user, book_id=book, rating=rating)
+        rating_obj = Rating(user_id=user_id, book_id=book_id, rating=rating)
         rating_obj.save()
 
         serializer = RatingSerializer(rating_obj)
@@ -104,13 +123,19 @@ class CommentList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, book_id):
-        user = request.data.get('user')
+        user_id = request.data.get('user_id')  # Get user_id from the request
         content = request.data.get('content')
+
+        user = User.objects.filter(id=user_id).first()  # Retrieve the user object
+        book = Book.objects.filter(id=book_id).first()  # Retrieve the book object
+
+        if not user or not book:
+            return Response({"detail": "User or Book not found."}, status=status.HTTP_404_NOT_FOUND)
 
         if not content:
             return Response({"detail": "Content cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
 
-        comment = Comment(user_id=user, book_id=book_id, content=content)
+        comment = Comment(user_id=user_id, book_id=book_id, content=content)
         comment.save()
 
         serializer = CommentSerializer(comment)
@@ -125,17 +150,24 @@ class CommentLikeList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, book_id):
-        user = request.data.get('user')
-        comment = request.data.get('comment')
+        user_id = request.data.get('user_id')  # Get user_id from the request
+        comment_id = request.data.get('comment_id')  # Get comment_id from the request
 
-        if CommentLike.objects.filter(user=user, comment=comment).exists():
+        user = User.objects.filter(id=user_id).first()  # Retrieve the user object
+        comment = Comment.objects.filter(id=comment_id).first()  # Retrieve the comment object
+
+        if not user or not comment:
+            return Response({"detail": "User or Comment not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if CommentLike.objects.filter(user_id=user, comment_id=comment_id).exists():
             return Response({"detail": "You have already liked this comment."}, status=status.HTTP_400_BAD_REQUEST)
 
-        comment_like = CommentLike(user_id=user, comment_id=comment)
+        comment_like = CommentLike(user_id=user_id, comment_id=comment_id)
         comment_like.save()
 
         serializer = CommentLikeSerializer(comment_like)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 # View for listing books loved by a user with pagination
