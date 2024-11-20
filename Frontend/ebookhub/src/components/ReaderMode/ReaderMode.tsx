@@ -119,31 +119,31 @@ const ReaderMode: React.FC = () => {
           className={`reader-mode__filter-button ${category === 'all' ? 'active' : ''}`}
           onClick={() => switchCategory('all')}
         >
-          All Books
+          All
         </button>
         <button
           className={`reader-mode__filter-button ${category === 'loved' ? 'active' : ''}`}
           onClick={() => switchCategory('loved')}
         >
-          Loved Books
+          Loved
         </button>
         <button
           className={`reader-mode__filter-button ${category === 'bookmarked' ? 'active' : ''}`}
           onClick={() => switchCategory('bookmarked')}
         >
-          Bookmarked Books
+          Bookmarked
         </button>
         <button
           className={`reader-mode__filter-button ${category === 'rated' ? 'active' : ''}`}
           onClick={() => switchCategory('rated')}
         >
-          Rated Books
+          Rated
         </button>
         <button
           className={`reader-mode__filter-button ${category === 'commented' ? 'active' : ''}`}
           onClick={() => switchCategory('commented')}
         >
-          Commented Books
+          Commented
         </button>
       </div>
 

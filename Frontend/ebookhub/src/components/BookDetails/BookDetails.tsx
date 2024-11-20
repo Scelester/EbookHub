@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchData } from '../../services/apiService'; // Import your fetchData helper
+import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = process.env.REACT_APP_API_URL;
 
@@ -55,6 +56,7 @@ const BookDetails: React.FC = () => {
   const [loading, setLoading] = useState(false);  // Loading state for chapters
   const [currentPage, setCurrentPage] = useState(1);  // Current page of chapters to fetch
   const chaptersContainerRef = useRef<HTMLDivElement | null>(null);  // Ref for scroll container
+  const navigate = useNavigate();
 
   const userId = 6;
   const ITEMS_PER_PAGE = 10;  // Number of chapters to load per request
@@ -64,7 +66,6 @@ const BookDetails: React.FC = () => {
       // Fetch book details only (no interactions yet)
       fetchData(`/books/${bookId}/`, 'GET')
         .then((response) => {
-          console.log(response)
           setBook(response);
           setChapters(response.chapters.slice(0, ITEMS_PER_PAGE)); // Initialize with first page of chapters
           setIsLoved(response.is_loved);
@@ -113,7 +114,7 @@ const BookDetails: React.FC = () => {
     const url = `/readers/books/${bookId}/bookmarks/`;
     const method = isBookmarked ? 'DELETE' : 'POST';
     fetchData(url, method, { user_id: userId, book_id: bookId })
-      .then((r) => {setIsBookmarked(!isBookmarked);console.log(r)})
+      .then((r) => { setIsBookmarked(!isBookmarked); console.log(r) })
       .catch(error => console.error("Error toggling bookmark:", error));
   };
 
@@ -137,6 +138,12 @@ const BookDetails: React.FC = () => {
       .catch(error => console.error("Error submitting comment:", error));
   };
 
+  const handleChapterClick = (chapterId: number) => {
+    navigate(`/books/${bookId}/c/${chapterId}`);
+  };
+
+
+
   if (!book) return <p>Loading...</p>;
 
   return (
@@ -158,7 +165,9 @@ const BookDetails: React.FC = () => {
         <h3>Chapters</h3>
         <ul>
           {chapters.map((chapter) => (
-            <li key={chapter.id}>{chapter.chapter_title}</li>
+            <li key={chapter.id} onClick={() => handleChapterClick(chapter.id)}>
+            {chapter.chapter_title}
+          </li>
           ))}
         </ul>
         {loading && <p>Loading more chapters...</p>}

@@ -6,9 +6,10 @@ from rest_framework.pagination import PageNumberPagination
 
 from django.contrib.auth.models import User
 from django.db.models import Avg  # Import Avg for aggregation
+from django.shortcuts import get_object_or_404
 
-from basic.models import Book
-from basic.serializers import BookSerializer
+from basic.models import Book,Chapter
+from basic.serializers import BookSerializer,ChapterSerializer
 from readers.models import Love, Bookmark, Rating, Comment, CommentLike
 from readers.serializers import LoveSerializer, BookmarkSerializer, RatingSerializer, CommentSerializer, CommentLikeSerializer
 
@@ -68,6 +69,8 @@ class LoveList(APIView):
 
         love.delete()
         return Response({"detail": "Love removed."}, status=status.HTTP_204_NO_CONTENT)
+    
+
 
 
 class BookmarkList(APIView):
@@ -270,3 +273,26 @@ class BooksCommentedByUserView(APIView):
         
         serializer = BookSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+
+
+class ChapterDetail(APIView):
+    """
+    Retrieve a specific chapter's details along with the list of all chapters in the book.
+    """
+    def get(self, request, book_id, chapter_id):
+        # Fetch the requested chapter
+        chapter = get_object_or_404(Chapter, id=chapter_id, book_id=book_id)
+        chapter_serializer = ChapterSerializer(chapter)
+
+        # Fetch all chapters in the book
+        all_chapters = Chapter.objects.filter(book_id=book_id).order_by('chapter_number')
+        all_chapters_serializer = ChapterSerializer(all_chapters, many=True)
+
+        return Response(
+            {
+                "chapter": chapter_serializer.data,
+                "all_chapters": all_chapters_serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )

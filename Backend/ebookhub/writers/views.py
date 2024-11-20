@@ -137,7 +137,7 @@ class UploadEPUBView(APIView):
             return Response({"detail": f"Failed to extract chapters: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"detail": f"Book '{book.title}' uploaded successfully."}, status=status.HTTP_201_CREATED)
-
+        
     def extract_chapters_from_epub(self, book):
         # Open the EPUB file
         epub_book = epub.read_epub(book.file.path)
@@ -146,7 +146,7 @@ class UploadEPUBView(APIView):
         chapter_order = 1
         for item in epub_book.get_items():
             if item.get_type() == ebooklib.ITEM_DOCUMENT:
-                # Extract the content of each chapter
+                # Parse the content of the chapter
                 soup = BeautifulSoup(item.content, 'html.parser')
 
                 # Extract the title of the chapter
@@ -158,8 +158,8 @@ class UploadEPUBView(APIView):
                 else:
                     chapter_title = f"Chapter {chapter_order}"
                 
-                # Preserve spaces and newlines
-                chapter_content = soup.prettify(formatter="minimal")  # Keep formatting intact
+                # Extract the text content while preserving spaces and newlines
+                chapter_content = soup.get_text(separator="\n\n", strip=True)  # Maintain newline for readability
 
                 # Create and save each chapter
                 Chapter.objects.create(
@@ -174,6 +174,7 @@ class UploadEPUBView(APIView):
         return book
 
 
+    
 class ChapterListView(APIView):
     def get(self, request, book_id):
         chapters = Chapter.objects.filter(book_id=book_id)

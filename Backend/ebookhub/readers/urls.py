@@ -2,7 +2,8 @@ from django.urls import path
 from readers import views
 urlpatterns = [
     path('books/', views.BookList.as_view(), name='book-list'),  
-    
+    path('books/<int:book_id>/c/<int:chapter_id>/', views.ChapterDetail.as_view(), name='chapter-detail'),    
+
     # Routes for a specific book's actions by user 
     path('books/<int:book_id>/loves/', views.LoveList.as_view(), name='love-list'),
     path('books/<int:book_id>/bookmarks/', views.BookmarkList.as_view(), name='bookmark-list'),

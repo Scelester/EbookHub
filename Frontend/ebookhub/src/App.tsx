@@ -6,6 +6,7 @@ import ReaderMode from './components/ReaderMode/ReaderMode';
 import LoginPage from './components/LoginPage/LoginPage';
 import SignupPage from './components/SignupPage/SignupPage';
 import BookDetail from './components/BookDetails/BookDetails';
+import ReadChapter from './components/ReadChapter/ReadChapter';
 import Modal from './components/Modal';
 import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute
 
@@ -86,6 +87,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/books/:bookId" element={<BookDetail />} />
+          <Route path="/books/:book_id/c/:chapter_id" element={<ReadChapter />} />
           <Route
             path="/author"
             element={
