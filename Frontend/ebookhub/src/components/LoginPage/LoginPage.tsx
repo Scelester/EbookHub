@@ -19,8 +19,8 @@ const LoginPage: React.FC = () => {
       localStorage.setItem('refreshToken', data.refresh);
       localStorage.setItem('user_id',data.user_id);
       
-      setSuccess('You are logged in!'); // Set success message
-      setError(''); // Clear any previous errors
+      setSuccess('You are logged in!'); 
+      setError(''); 
 
       // Refresh the page after a short delay
       setTimeout(() => {

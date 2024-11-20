@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
-import './ReaderMode.css'
+import './ReaderMode.css';
+import { fetchData } from '../../services/apiService';  // Import the fetchData function
 
 const BASE_URL = process.env.REACT_APP_API_URL;
 
 interface Book {
   id: number;
   title: string;
-  author: number;
+  author: {
+    id: number;
+    name: string;
+    bio: string;
+  };
   description: string;
-  genre: number[];
+  genre: Array<{
+    id: number;
+    name: string;
+  }>;
   cover_image_url: string;
   date_published: string;
   rating: string;
@@ -47,38 +54,36 @@ const ReaderMode: React.FC = () => {
   });
 
   const fetchBooks = async (userId: number, category: string, url?: string) => {
-    let requestUrl = url || `${BASE_URL}/readers/books/`;
+    let requestUrl = url || `/readers/books/`;
 
     if (category === 'loved') {
-      requestUrl = `${BASE_URL}/readers/users/${userId}/loved-books/`;
+      requestUrl = `/readers/users/${userId}/loved-books/`;
     } else if (category === 'bookmarked') {
-      requestUrl = `${BASE_URL}/readers/users/${userId}/bookmarked-books/`;
+      requestUrl = `/readers/users/${userId}/bookmarked-books/`;
     } else if (category === 'rated') {
-      requestUrl = `${BASE_URL}/readers/users/${userId}/rated-books/`;
+      requestUrl = `/readers/users/${userId}/rated-books/`;
     } else if (category === 'commented') {
-      requestUrl = `${BASE_URL}/readers/users/${userId}/commented-books/`;
+      requestUrl = `/readers/users/${userId}/commented-books/`;
     }
 
     try {
-      const response = await axios.get<PaginatedResponse>(requestUrl);
-      const booksWithNames = await Promise.all(response.data.results.map(async (book) => {
-        const authorResponse = await axios.get(`${BASE_URL}/authors/${book.author}/`);
-        const genreNames = await Promise.all(book.genre.map(async (genreId) => {
-          const genreResponse = await axios.get(`${BASE_URL}/genres/${genreId}/`);
-          return genreResponse.data.name;
-        }));
+      const response = await fetchData(requestUrl, 'GET');  // Using the fetchData helper function
+
+      const booksWithNames = response.results.map((book: Book) => {
+        const authorName = book.author.name;  // Directly using author name from response
+        const genreNames = book.genre.map((genre) => genre.name);  // Extract genre names
 
         return {
           ...book,
-          authorName: authorResponse.data.name,
-          genreNames: genreNames,
+          authorName,
+          genreNames,
         };
-      }));
+      });
 
       setBooks(booksWithNames);
       setPagination({
-        next: response.data.next,
-        previous: response.data.previous,
+        next: response.next,
+        previous: response.previous,
       });
     } catch (error) {
       console.error(`Error fetching ${category} books:`, error);
@@ -147,7 +152,7 @@ const ReaderMode: React.FC = () => {
         {books.length > 0 ? (
           books.map((book) => (
             <Link to={`/books/${book.id}`} key={book.id} className="reader-mode__book-item">
-              <img src={BASE_URL+book.cover_image_url} alt={book.title} className="reader-mode__book-cover" />
+              <img src={BASE_URL + book.cover_image_url} alt={book.title} className="reader-mode__book-cover" />
               <div className="reader-mode__book-title">{book.title}</div>
               <div className="reader-mode__book-author">{book.authorName}</div>
               <div className="reader-mode__book-genres">{book.genreNames.join(', ')}</div>

@@ -3,7 +3,7 @@ from readers import views
 urlpatterns = [
     path('books/', views.BookList.as_view(), name='book-list'),  
     
-    # Routes for a specific book's actions
+    # Routes for a specific book's actions by user 
     path('books/<int:book_id>/loves/', views.LoveList.as_view(), name='love-list'),
     path('books/<int:book_id>/bookmarks/', views.BookmarkList.as_view(), name='bookmark-list'),
     path('books/<int:book_id>/ratings/', views.RatingList.as_view(), name='rating-list'),

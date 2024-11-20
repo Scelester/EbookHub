@@ -67,7 +67,7 @@ class Chapter(models.Model):
     chapter_title = models.CharField(max_length=200)
     content = models.TextField()  
     chapter_number = models.PositiveIntegerField()
-    date_published = models.DateField()
+    date_published = models.DateField(auto_now_add=True)
     
 
     class Meta:

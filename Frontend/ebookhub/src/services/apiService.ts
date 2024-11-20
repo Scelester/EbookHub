@@ -1,8 +1,85 @@
-// src/services/apiService.ts
 const API_URL = 'http://localhost:8000'; // Base URL for your API
 
-// Helper function to handle fetching
-const fetchData = async (endpoint: string, method: string, body?: any) => {
+// Get the access and refresh tokens from localStorage
+const getAuthToken = () => localStorage.getItem('accessToken');
+const getRefreshToken = () => localStorage.getItem('refreshToken');
+
+// Helper function to fetch the new access token using the refresh token
+const refreshAuthToken = async () => {
+  const refreshToken = getRefreshToken();
+
+  if (!refreshToken) {
+    throw new Error('Refresh token not available');
+  }
+
+  const response = await fetch(`${API_URL}/api/token/refresh/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refresh: refreshToken }),  // Adjusted to match expected payload (refresh token)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('Refresh token failed:', errorData);
+    throw new Error('Failed to refresh access token');
+  }
+
+  const data = await response.json();
+  // Save new access token
+  localStorage.setItem('accessToken', data.access);
+  return data.access;
+};
+
+// Helper function to handle API requests that require authentication
+export const fetchData = async (endpoint: string, method: string, body?: any) => {
+  let token = getAuthToken();  // Get the current access token
+
+  if (!token) {
+    throw new Error('Access token not available');
+  }
+
+  let response = await fetch(`${API_URL}${endpoint}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  // If the access token is expired (usually 401 Unauthorized), try refreshing it
+  if (response.status === 401) {
+    try {
+      token = await refreshAuthToken(); // Try to refresh the token
+      // Retry the original request with the new access token
+      response = await fetch(`${API_URL}${endpoint}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch (error) {
+      console.error('Session expired or refresh failed:', error);
+      // Handle user session expiration, e.g., redirect to login page
+      throw new Error('Session expired, please log in again');
+    }
+  }
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('API request failed:', errorData);
+    throw new Error(errorData.error || 'Something went wrong');
+  }
+
+  return response.json();
+};
+
+// Helper function to handle API requests without authentication (for login/signup)
+export const fetchDataWithoutAuth = async (endpoint: string, method: string, body?: any) => {
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers: {
@@ -13,6 +90,7 @@ const fetchData = async (endpoint: string, method: string, body?: any) => {
 
   if (!response.ok) {
     const errorData = await response.json();
+    console.error('Request failed:', errorData);
     throw new Error(errorData.error || 'Something went wrong');
   }
 
@@ -20,14 +98,16 @@ const fetchData = async (endpoint: string, method: string, body?: any) => {
 };
 
 // Signup function
-// Update the signup function to include fullName
 export const signup = async (email: string, username: string, password: string, fullName: string, role: string) => {
-  return fetchData('/signup/', 'POST', { email, username, password, full_name: fullName, role }); // Include full_name
+  return fetchDataWithoutAuth('/signup/', 'POST', { email, username, password, full_name: fullName, role });
 };
 
 // Login function
 export const login = async (username: string, password: string) => {
-  return fetchData('/login/', 'POST', { username, password });
+  return fetchDataWithoutAuth('/login/', 'POST', { username, password });
 };
 
-
+// Helper function to check if the user is logged in
+export const isLoggedIn = (): boolean => {
+  return !!getAuthToken();
+};

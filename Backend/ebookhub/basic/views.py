@@ -1,10 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
 from rest_framework import status, generics
+from rest_framework.exceptions import PermissionDenied
+
+from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.db.models import Q  
+
 from .models import Author, Genre,Profile,Book
 from .serializers import AuthorSerializer, UserSerializer, GenreSerializer,BookDetailSerializer
 
@@ -43,6 +47,31 @@ class SignupView(APIView):
             print("Exception:", e)  # Log any other exceptions
             return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+class TokenRefreshViewCustom(APIView):
+    """
+    Custom view for refreshing JWT access token using a refresh token.
+    """
+    # permission_classes = [IsAuthenticated]  
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+        
+        if not refresh_token:
+            return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Create a refresh token object
+            refresh = RefreshToken(refresh_token)
+            # Generate a new access token
+            new_access_token = str(refresh.access_token)
+            
+            return Response({
+                'access': new_access_token
+            }, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
@@ -93,7 +122,25 @@ class GenreDetailView(APIView):
             return Response({'error': 'Genre not found'}, status=status.HTTP_404_NOT_FOUND)
         
 
+
 class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookDetailSerializer
     lookup_field = 'id'
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def get_serializer_context(self):
+        """
+        Override this method to add the `user` to the context of the serializer.
+        """
+        context = super().get_serializer_context()
+        if self.request.user.is_authenticated:
+            context['user'] = self.request.user  # Add the authenticated user to the context
+        return context
+
+    def get(self, request, *args, **kwargs):
+        # If user is not authenticated, raise PermissionDenied
+        if not request.user.is_authenticated:
+            raise PermissionDenied("You must be logged in to view this book detail.")
+
+        return super().get(request, *args, **kwargs)

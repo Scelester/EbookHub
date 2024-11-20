@@ -4,6 +4,8 @@ from .models import Book, Chapter, Genre, SupportedFormat, Profile, Author
 class ChapterInline(admin.TabularInline):
     model = Chapter
     extra = 1  # Show 1 empty chapter form by default
+    fields = ('chapter_title',)  # Only show the chapter title field
+
 
 class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'publisher', 'date_published', 'format', 'can_fork')

@@ -24,22 +24,25 @@ const App: React.FC = () => {
   };
 
   const toggleDropdown = () => {
-    setShowDropdown(prev => !prev);
+    setShowDropdown((prev) => !prev);
   };
 
-  // Close dropdown if clicked outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
+  const closeDropdown = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setShowDropdown(false);
+    }
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
+  useEffect(() => {
+    document.addEventListener('mousedown', closeDropdown);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', closeDropdown);
     };
   }, []);
+
+  const handleModalClose = (type: 'login' | 'signup') => {
+    type === 'login' ? setIsLoginOpen(false) : setIsSignupOpen(false);
+  };
 
   return (
     <Router>
@@ -101,15 +104,18 @@ const App: React.FC = () => {
           />
         </Routes>
 
-        {/* Modal for Login */}
-        <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
-          <LoginPage />
-        </Modal>
+        {/* Modal for Login/Signup */}
+        {isLoginOpen && (
+          <Modal isOpen={isLoginOpen} onClose={() => handleModalClose('login')}>
+            <LoginPage />
+          </Modal>
+        )}
 
-        {/* Modal for Signup */}
-        <Modal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)}>
-          <SignupPage />
-        </Modal>
+        {isSignupOpen && (
+          <Modal isOpen={isSignupOpen} onClose={() => handleModalClose('signup')}>
+            <SignupPage />
+          </Modal>
+        )}
       </div>
     </Router>
   );

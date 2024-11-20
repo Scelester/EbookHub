@@ -79,8 +79,8 @@ class UploadEPUBView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
-        # Get the uploaded EPUB file
         epub_file = request.FILES.get('file')
+        cover_file = request.FILES.get('cover_image')  # Cover image file
 
         if not epub_file:
             return Response({"detail": "No EPUB file provided."}, status=status.HTTP_400_BAD_REQUEST)
@@ -89,7 +89,7 @@ class UploadEPUBView(APIView):
         book_data = request.data
         book_title = book_data.get('title')
         book_author_name = book_data.get('author')
-        book_genre_list = book_data.get('genre')  # Expecting a list of genre names or IDs
+        book_genre_list = book_data.get('genre')  
         book_description = book_data.get('description')
         user_id = book_data.get('user_id')  # Get user_id from the request data
 
@@ -108,34 +108,39 @@ class UploadEPUBView(APIView):
         # Assuming 'Format' model exists and you have a default format entry
         default_format, _ = SupportedFormat.objects.get_or_create(name='EPUB')
 
-        # Process genres
+        # Process genre list
         genres = []
-        for genre_name in book_genre_list:
+        for genre_name in book_genre_list.split():
+            genre_name = genre_name.title()
             genre, created = Genre.objects.get_or_create(name=genre_name)
             genres.append(genre)
 
-        # Create the book instance with the format
+        # Create the book instance with the format and cover (if provided)
         book = Book.objects.create(
             title=book_title,
             author=author,
             publisher=user,
             description=book_description,
             file=epub_file,
-            format=default_format,  # Provide the default format
+            cover_image=cover_file if cover_file else None,  # Assign cover file if provided
+            format=default_format,
             date_published=datetime.now().strftime("%Y-%m-%d")
         )
-       
+
+        # Associate genres with the book
+        book.genre.set(genres)
 
         try:
-            book = self.extract_chapters_from_epub(book, epub_file)
+            book = self.extract_chapters_from_epub(book)
         except Exception as e:
+            print("error:===========",e)
             return Response({"detail": f"Failed to extract chapters: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"detail": f"Book '{book.title}' uploaded successfully."}, status=status.HTTP_201_CREATED)
 
-    def extract_chapters_from_epub(self, book, epub_file):
+    def extract_chapters_from_epub(self, book):
         # Open the EPUB file
-        epub_book = epub.read_epub(epub_file)
+        epub_book = epub.read_epub(book.file.path)
 
         # Extract the chapters
         chapter_order = 1
@@ -143,21 +148,30 @@ class UploadEPUBView(APIView):
             if item.get_type() == ebooklib.ITEM_DOCUMENT:
                 # Extract the content of each chapter
                 soup = BeautifulSoup(item.content, 'html.parser')
-                chapter_title = soup.find('title').text if soup.find('title') else f"Chapter {chapter_order}"
-                chapter_content = soup.get_text()
+
+                # Extract the title of the chapter
+                chapter_title_tag = soup.find('p', class_='chaptertitle')
+
+                # Check if the chapter title element is found
+                if chapter_title_tag:
+                    chapter_title = chapter_title_tag.get_text(strip=True)
+                else:
+                    chapter_title = f"Chapter {chapter_order}"
+                
+                # Preserve spaces and newlines
+                chapter_content = soup.prettify(formatter="minimal")  # Keep formatting intact
 
                 # Create and save each chapter
                 Chapter.objects.create(
                     book=book,
-                    title=chapter_title,
+                    chapter_title=chapter_title,
                     content=chapter_content,
-                    order=chapter_order
+                    chapter_number=chapter_order
                 )
 
                 chapter_order += 1
 
         return book
-
 
 
 class ChapterListView(APIView):
