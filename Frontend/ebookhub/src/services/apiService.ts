@@ -1,10 +1,11 @@
-const API_URL = 'http://localhost:8000'; // Base URL for your API
+
+const API_URL = process.env.REACT_APP_API_URL; // Base URL for your API
 
 // Get the access and refresh tokens from localStorage
 const getAuthToken = () => localStorage.getItem('accessToken');
 const getRefreshToken = () => localStorage.getItem('refreshToken');
 
-// Helper function to fetch the new access token using the refresh token
+// Helper function to refresh the access token using the refresh token
 const refreshAuthToken = async () => {
   const refreshToken = getRefreshToken();
 
@@ -30,6 +31,13 @@ const refreshAuthToken = async () => {
   // Save new access token
   localStorage.setItem('accessToken', data.access);
   return data.access;
+};
+
+// Handle logout
+const handleLogout = () => {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  window.location.reload();
 };
 
 // Helper function to handle API requests that require authentication
@@ -64,7 +72,8 @@ export const fetchData = async (endpoint: string, method: string, body?: any) =>
       });
     } catch (error) {
       console.error('Session expired or refresh failed:', error);
-      // Handle user session expiration, e.g., redirect to login page
+      // Handle user session expiration
+      handleLogout(); // Logout user and clear tokens
       throw new Error('Session expired, please log in again');
     }
   }
@@ -75,9 +84,13 @@ export const fetchData = async (endpoint: string, method: string, body?: any) =>
     throw new Error(errorData.error || 'Something went wrong');
   }
 
+  // Handle empty response body safely for 204 No Content
+  if (response.status === 204) {
+    return {};  // Return empty object when there's no content
+  }
+
   return response.json();
 };
-
 // Helper function to handle API requests without authentication (for login/signup)
 export const fetchDataWithoutAuth = async (endpoint: string, method: string, body?: any) => {
   const response = await fetch(`${API_URL}${endpoint}`, {

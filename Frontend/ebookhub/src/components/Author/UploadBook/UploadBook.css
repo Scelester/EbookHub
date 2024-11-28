@@ -1,0 +1,82 @@
+/* Container and header styles */
+#upload-book-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  #upload-book-header {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  /* Form styles */
+  #upload-book-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-label {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    height: 100px;
+  }
+  
+  #upload-book-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  #upload-book-button:disabled {
+    background-color: #ccc;
+  }
+  
+  #upload-book-button.uploading {
+    background-color: #45a049;
+  }
+  
+  /* Message styles */
+  .upload-message {
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  
+  .upload-message.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+  }
+  
+  .upload-message.error {
+    background-color: #f2dede;
+    color: #a94442;
+  }
+  

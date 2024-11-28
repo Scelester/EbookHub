@@ -1,19 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import { fetchData } from '../../services/apiService'; // Import your fetchData helper
-import { useNavigate } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
+import { fetchData } from '../../../services/apiService'; 
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+// const BASE_URL = process.env.REACT_APP_API_URL;
 
 interface Chapter {
   id: number;
   chapter_title: string;
 }
 
-interface Genre {
-  id: number;
-  name: string;
-}
+// interface Genre {
+//   id: number;
+//   name: string;
+// }
 
 interface Author {
   id: number;
@@ -64,7 +63,7 @@ const BookDetails: React.FC = () => {
   useEffect(() => {
     if (bookId) {
       // Fetch book details only (no interactions yet)
-      fetchData(`/books/${bookId}/`, 'GET')
+      fetchData(`/readers/books/${bookId}/`, 'GET')
         .then((response) => {
           setBook(response);
           setChapters(response.chapters.slice(0, ITEMS_PER_PAGE)); // Initialize with first page of chapters
@@ -114,7 +113,7 @@ const BookDetails: React.FC = () => {
     const url = `/readers/books/${bookId}/bookmarks/`;
     const method = isBookmarked ? 'DELETE' : 'POST';
     fetchData(url, method, { user_id: userId, book_id: bookId })
-      .then((r) => { setIsBookmarked(!isBookmarked); console.log(r) })
+      .then((r) => { setIsBookmarked(!isBookmarked); })
       .catch(error => console.error("Error toggling bookmark:", error));
   };
 
@@ -128,6 +127,7 @@ const BookDetails: React.FC = () => {
     fetchData(`/readers/books/${bookId}/comments/`, 'POST', { user_id: userId, book_id: bookId, content: comment })
       .then(response => {
         const newComment = response;
+        newComment.user__username = newComment.user;
         if (newComment && newComment.content) {
           setComments([...comments, newComment]);
           setComment('');
@@ -165,9 +165,14 @@ const BookDetails: React.FC = () => {
         <h3>Chapters</h3>
         <ul>
           {chapters.map((chapter) => (
-            <li key={chapter.id} onClick={() => handleChapterClick(chapter.id)}>
-            {chapter.chapter_title}
-          </li>
+            <li
+              key={chapter.id}
+              onClick={() => handleChapterClick(chapter.id)}
+              style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }} // Optional styling to indicate it's clickable
+            >
+              {chapter.chapter_title}
+            </li>
+
           ))}
         </ul>
         {loading && <p>Loading more chapters...</p>}

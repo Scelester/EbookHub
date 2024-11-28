@@ -20,4 +20,3 @@ const trackUserInteraction = (interactionType: string, additionalData: object) =
   };
   
   export default trackUserInteraction;
-  

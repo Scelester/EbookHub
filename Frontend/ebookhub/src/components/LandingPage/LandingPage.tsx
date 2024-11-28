@@ -11,11 +11,11 @@ const LandingPage: React.FC = () => {
 
         <div className="button-container">
           <Link to="/reader" className="routingButton">
-            Reader Mode
+            Reader
           </Link>
 
           <Link to="/author" className="routingButton">
-            Author Mode
+            Author
           </Link>
         </div>
       </div>

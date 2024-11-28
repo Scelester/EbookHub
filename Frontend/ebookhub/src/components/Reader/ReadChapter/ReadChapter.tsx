@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchData } from '../../services/apiService'; // Your API helper
+import { fetchData } from '../../../services/apiService'; // Your API helper
 
 interface Chapter {
   id: number;

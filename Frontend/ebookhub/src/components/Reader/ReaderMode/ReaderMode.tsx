@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './ReaderMode.css';
-import { fetchData } from '../../services/apiService';  // Import the fetchData function
+import { fetchData } from '../../../services/apiService';  // Import the fetchData function
 
 const BASE_URL = process.env.REACT_APP_API_URL;
 
@@ -33,12 +33,12 @@ interface BookWithNames extends Book {
   genreNames: string[];
 }
 
-interface PaginatedResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: Book[];
-}
+// interface PaginatedResponse {
+//   count: number;
+//   next: string | null;
+//   previous: string | null;
+//   results: Book[];
+// }
 
 const ReaderMode: React.FC = () => {
   const [books, setBooks] = useState<BookWithNames[]>([]);
@@ -92,7 +92,7 @@ const ReaderMode: React.FC = () => {
 
   useEffect(() => {
     fetchBooks(userId, category);
-  }, [category]);
+  }, [userId, category]);
 
   const switchCategory = (newCategory: string) => {
     setCategory(newCategory);
