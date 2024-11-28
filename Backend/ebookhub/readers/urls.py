@@ -10,6 +10,7 @@ urlpatterns = [
     path('books/<int:book_id>/ratings/', views.RatingList.as_view(), name='rating-list'),
     path('books/<int:book_id>/comments/', views.CommentList.as_view(), name='comment-list'),
     path('books/<int:book_id>/comment-likes/', views.CommentLikeList.as_view(), name='comment-like-list'),
+    path('books/<int:id>/', views.BookDetailView.as_view(), name='book-detail'),
     
     # Routes for listing books that a user has interacted with
     path('users/<int:user_id>/loved-books/', views.BooksLovedByUserView.as_view(), name='books-loved-by-user'),

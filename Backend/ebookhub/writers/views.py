@@ -2,15 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
-from datetime import datetime
-from django.core.exceptions import ValidationError
-from django.utils.text import slugify
-from basic.models import Book, Chapter, Fork, Author,Genre,SupportedFormat
+
+# from django.core.exceptions import ValidationError
+# from django.utils.text import slugify
+from basic.models import Book, Chapter, Fork, Author,Genre,SupportedFormat,Profile
 from basic.serializers import BookSerializer, ChapterSerializer
+from django.contrib.auth.models import User
+
+from datetime import datetime
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
-from django.contrib.auth.models import User
 
 
 class BooksByAuthorView(APIView):
@@ -18,6 +20,21 @@ class BooksByAuthorView(APIView):
         # Get books written by the author (books where author is the given user)
         books = Book.objects.filter(author_id=author_id)
         serializer = BookSerializer(books, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class MybooksView(APIView):
+    def get(self, request, publisher_id):
+        # Get the `reverse` parameter from the query string
+        reverse = request.query_params.get('reverse', 'false').lower() == 'true'
+        
+        
+
+        # Filter books by publisher ID
+        books = Book.objects.filter(publisher_id=publisher_id)
+        
+        # Pass the `reverse` parameter to the serializer context
+        serializer = BookSerializer(books, many=True, context={ 'reverse': reverse})
+        
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -59,6 +76,7 @@ class ForkBookView(APIView):
             cover_image=original_book.cover_image,
             date_published=datetime.now().strftime("%Y-%m-%d"),  # Set the current date as the publication date
             can_fork=False,  # Forked books cannot be forked again
+            is_forked=True,
             ongoing=original_book.ongoing,
         )
 
@@ -156,7 +174,7 @@ class UploadEPUBView(APIView):
                 if chapter_title_tag:
                     chapter_title = chapter_title_tag.get_text(strip=True)
                 else:
-                    chapter_title = f"Chapter {chapter_order}"
+                    chapter_title = f"{chapter_order}"
                 
                 # Extract the text content while preserving spaces and newlines
                 chapter_content = soup.get_text(separator="\n\n", strip=True)  # Maintain newline for readability
@@ -227,3 +245,21 @@ class ChapterDeleteView(APIView):
 
         chapter.delete()
         return Response({"detail": f"Chapter '{chapter_id}' deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+
+class DropdownDataAPIView(APIView):
+    """
+    API view to fetch book titles, author names, and genres for dropdown menus.
+    """
+    def get(self, request, *args, **kwargs):
+        # Fetch all books, authors, and genres
+        books = Book.objects.values_list('title', flat=True)
+        authors = Author.objects.values_list('name', flat=True)
+        genres = Genre.objects.values_list('name', flat=True)
+
+        # Return the data as JSON response
+        return Response({
+            "books": list(books),
+            "authors": list(authors),
+            "genres": list(genres),
+        }, status=status.HTTP_200_OK)

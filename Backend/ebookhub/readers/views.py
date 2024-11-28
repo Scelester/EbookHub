@@ -1,15 +1,17 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.exceptions import PermissionDenied
+from rest_framework import status, generics
+
 
 from django.contrib.auth.models import User
 from django.db.models import Avg  # Import Avg for aggregation
 from django.shortcuts import get_object_or_404
 
 from basic.models import Book,Chapter
-from basic.serializers import BookSerializer,ChapterSerializer
+from basic.serializers import BookSerializer,ChapterSerializer, BookDetailSerializer
 from readers.models import Love, Bookmark, Rating, Comment, CommentLike
 from readers.serializers import LoveSerializer, BookmarkSerializer, RatingSerializer, CommentSerializer, CommentLikeSerializer
 
@@ -273,6 +275,28 @@ class BooksCommentedByUserView(APIView):
         
         serializer = BookSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+class BookDetailView(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookDetailSerializer
+    lookup_field = 'id'
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def get_serializer_context(self):
+        """
+        Override this method to add the `user` to the context of the serializer.
+        """
+        context = super().get_serializer_context()
+        if self.request.user.is_authenticated:
+            context['user'] = self.request.user  # Add the authenticated user to the context
+        return context
+
+    def get(self, request, *args, **kwargs):
+        # If user is not authenticated, raise PermissionDenied
+        if not request.user.is_authenticated:
+            raise PermissionDenied("You must be logged in to view this book detail.")
+
+        return super().get(request, *args, **kwargs)
 
 
 

@@ -15,11 +15,11 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = Author
         fields = ['id', 'name', 'bio']  # You can customize fields as needed
 
-
+# todo - edit this serialier to paginated books with the given genres
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ['id', 'name']  # Include the fields you need
+        fields = ['id', 'name']
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -43,8 +43,32 @@ class BookSerializer(serializers.ModelSerializer):
         return cover_image_url
 
     def get_chapters(self, obj):
+        # Get the default reverse setting from the user's profile
+        reverse_from_profile = False
+        request = self.context.get('request')
+
+        # Retrieve the profile's reversed chapter order setting if user is authenticated
+        if request and request.user.is_authenticated:
+            profile = getattr(request.user, 'profile', None)
+            if profile:
+                reverse_from_profile = profile.reversed_chapter_order
+
+        # Get the 'reverse' argument from the request
+        request_reverse = self.context.get('reverse', None)
+
+        # If 'reverse' is True in the request, flip the profile's setting
+        if request_reverse:
+            reverse = not reverse_from_profile
+        else:
+            reverse = reverse_from_profile
+
+        # Retrieve the chapters, ordered based on the final 'reverse' value
         chapters = obj.chapters.all()[:5]
-        return ChapterTitleSerializer(chapters, many=True).data
+        if reverse:
+            chapters = chapters[::-1]  # Reverse the chapter list if needed
+
+        return ChapterTitleSerializer(chapters, many=True).data 
+
 
 
 class BookDetailSerializer(serializers.ModelSerializer):
@@ -102,4 +126,4 @@ class ChapterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'  # This includes all fields from the User model
+        fields = '__all__'  

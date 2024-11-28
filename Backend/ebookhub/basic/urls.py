@@ -8,5 +8,5 @@ urlpatterns = [
     path('authors/<int:id>/', views.AuthorDetailView.as_view(), name='author-detail'),
     path('publishers/<int:id>/', views.PublisherDetailView.as_view(), name='publisher-detail'),
     path('genres/<int:id>/', views.GenreDetailView.as_view(), name='genre-detail'),
-    path('books/<int:id>/', views.BookDetailView.as_view(), name='book-detail')
+    path('api/generic_queries/',views.BasicQueryView.as_view(),name='generic_queries'),
 ]

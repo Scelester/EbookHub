@@ -2,15 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import status, generics
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import status
 
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.db.models import Q  
 
 from .models import Author, Genre,Profile,Book
-from .serializers import AuthorSerializer, UserSerializer, GenreSerializer,BookDetailSerializer
+from .serializers import AuthorSerializer, UserSerializer, GenreSerializer
 
 
 
@@ -106,7 +105,7 @@ class AuthorDetailView(APIView):
 class PublisherDetailView(APIView):
     def get(self, request, id):
         try:
-            publisher = User.objects.get(id=id)  # Get the user by ID (publisher)
+            publisher = User.objects.get(id=id)  
             serializer = UserSerializer(publisher)
             return Response(serializer.data)
         except User.DoesNotExist:
@@ -123,24 +122,28 @@ class GenreDetailView(APIView):
         
 
 
-class BookDetailView(generics.RetrieveAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookDetailSerializer
-    lookup_field = 'id'
-    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
 
-    def get_serializer_context(self):
-        """
-        Override this method to add the `user` to the context of the serializer.
-        """
-        context = super().get_serializer_context()
-        if self.request.user.is_authenticated:
-            context['user'] = self.request.user  # Add the authenticated user to the context
-        return context
+    
+
+class BasicQueryView(APIView):
+    """
+    API view to handle generic queries for books, authors, genres, etc.
+    """
 
     def get(self, request, *args, **kwargs):
-        # If user is not authenticated, raise PermissionDenied
-        if not request.user.is_authenticated:
-            raise PermissionDenied("You must be logged in to view this book detail.")
+        query_type = request.query_params.get('type', None)
+        
+        # Handle different query types
+        if query_type == 'books':
+            data = Book.objects.values_list('title', flat=True)
+        elif query_type == 'authors':
+            data = Author.objects.values_list('name', flat=True)
+        elif query_type == 'genres':
+            data = Genre.objects.values_list('name', flat=True)
+        else:
+            return Response(
+                {"error": "Invalid query type. Available types: books, authors, genres."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        return super().get(request, *args, **kwargs)
+        return Response(list(data), status=status.HTTP_200_OK)
